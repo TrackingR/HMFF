@@ -228,28 +228,21 @@ class VisionTransformerMDIM(BaseBackbone):
         if self.add_cls_token:
             cls_tokens = self.cls_token.expand(B, -1, -1)
             cls_tokens = cls_tokens + self.cls_pos_embed
-
-        # Visible and infrared data share the positional encoding and other parameters in ViT
         z_v += self.pos_embed_z
         x_v += self.pos_embed_x
         z_i += self.pos_embed_z
         x_i += self.pos_embed_x
-
         if self.add_sep_seg:
             x += self.search_segment_pos_embed
             z += self.template_segment_pos_embed
-
         x_v = combine_tokens(z_v, x_v, mode=self.cat_mode)
         x_i = combine_tokens(z_i, x_i, mode=self.cat_mode)
         if self.add_cls_token:
             x = torch.cat([cls_tokens, x], dim=1)
-
         x_v = self.pos_drop(x_v)
         x_i = self.pos_drop(x_i)
-
         lens_z = self.pos_embed_z.shape[1]
         lens_x = self.pos_embed_x.shape[1]
-        
         tbsi_index = 0
         x = torch.cat([x_v, x_i], dim=1)
         for i, blk in enumerate(self.blocks):
@@ -258,26 +251,9 @@ class VisionTransformerMDIM(BaseBackbone):
             if self.tbsi_loc is not None and i in self.tbsi_loc:
                 x_v, x_i = self.MDIM_layers[tbsi_index](x_v, x_i, lens_z)
                 tbsi_index += 1
-            # if self.tbsi_loc is not None and i in self.tbsi_loc:
-            #     x_v = x_ii + x_v
-            #     x_i = x_vv + x_i
-            #     x_vv = x_v
-            #     x_ii = x_i
-            #     x_vv = self.drop_path(self.adap_t(self.norm1(x_vv)))
-            #     x_ii = self.drop_path(self.adap_t(self.norm1(x_ii)))
         x_v = recover_tokens(x_v, lens_z, lens_x, mode=self.cat_mode)
         x_i = recover_tokens(x_i, lens_z, lens_x, mode=self.cat_mode)
         x = torch.cat([x_v, x_i], dim=1)
-        # x = torch.transpose(x, 1, 2)
-        # B_1 = x.shape[0];
-        # x = x.view(B_1, 768, 20, 32)
-        # x = self.cbam_layers(x)
-        # x = self.conv1d(x)
-        # x = x.view(B_1, 768, 640)
-        # x = torch.transpose(x, 1, 2)
-        #x = self.conv1d(x)
-        # x = self.fusion_layer(x_v, x_i)
-        
         aux_dict = {"attn": None}
         return self.norm(x), aux_dict
 
@@ -520,3 +496,4 @@ def vit_tiny_patch16_224(pretrained=False, **kwargs):
         patch_size=16, embed_dim=192, depth=12, num_heads=3, **kwargs)
     model = _create_vision_transformer('vit_tiny_patch16_224', pretrained=pretrained, **model_kwargs)
     return model
+
