@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 
+
 prj_path = os.path.join(os.path.dirname(__file__), '..')
 if prj_path not in sys.path:
     sys.path.append(prj_path)
@@ -44,9 +45,7 @@ def main():
     parser.add_argument('--debug', type=int, default=0, help='Debug level.')
     parser.add_argument('--threads', type=int, default=0, help='Number of threads.')
     parser.add_argument('--num_gpus', type=int, default=8)
-
     args = parser.parse_args()
-
     try:
         seq_name = int(args.sequence)
     except:
