@@ -16,7 +16,7 @@ from lib.utils.box_ops import clip_box
 from lib.utils.ce_utils import generate_mask_cond
 
 
-class TBSITrack(BaseTracker):
+class MDIMTrack(BaseTracker):
     def __init__(self, params, dataset_name):
         super(TBSITrack, self).__init__(params)
         network = build_tbsi_track(params.cfg, training=False)
@@ -160,4 +160,4 @@ class TBSITrack(BaseTracker):
 
 
 def get_tracker_class():
-    return TBSITrack
+    return MDIMTrack
