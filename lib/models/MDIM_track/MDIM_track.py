@@ -11,11 +11,11 @@ from torch import nn
 from torch.nn.modules.transformer import _get_clones
 
 from lib.models.layers.head import build_box_head, conv
-from lib.models.tbsi_track.vit_MDIM_care import vit_base_patch16_224_tbsi
+from lib.models.tbsi_track.vit_MDIM_care import vit_base_patch16_224
 from lib.utils.box_ops import box_xyxy_to_cxcywh
 
 
-class TBSITrack(nn.Module):
+class MDIMTrack(nn.Module):
     """ This is the base class for TBSITrack developed on OSTrack (Ye et al. ECCV 2022) """
 
     def __init__(self, transformer, box_head, aux_loss=False, head_type="CORNER"):
@@ -100,7 +100,7 @@ class TBSITrack(nn.Module):
             raise NotImplementedError
 
 
-def build_tbsi_track(cfg, training=True):
+def build_MDIM_track(cfg, training=True):
     current_dir = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
     pretrained_path = os.path.join(current_dir, '../../../pretrained_model')
     if cfg.MODEL.PRETRAIN_FILE and ('TBSITrack' not in cfg.MODEL.PRETRAIN_FILE) and training:
@@ -109,8 +109,8 @@ def build_tbsi_track(cfg, training=True):
     else:
         pretrained = ''
 
-    if cfg.MODEL.BACKBONE.TYPE == 'vit_base_patch16_224_tbsi':
-        backbone = vit_base_patch16_224_tbsi(pretrained, drop_path_rate=cfg.TRAIN.DROP_PATH_RATE,
+    if cfg.MODEL.BACKBONE.TYPE == 'vit_base_patch16_224':
+        backbone = vit_base_patch16_224(pretrained, drop_path_rate=cfg.TRAIN.DROP_PATH_RATE,
                                             tbsi_loc=cfg.MODEL.BACKBONE.TBSI_LOC,
                                             tbsi_drop_path=cfg.TRAIN.TBSI_DROP_PATH
                                             )
@@ -124,17 +124,18 @@ def build_tbsi_track(cfg, training=True):
 
     box_head = build_box_head(cfg, hidden_dim)
 
-    model = TBSITrack(
+    model = MDIMTrack(
         backbone,
         box_head,
         aux_loss=False,
         head_type=cfg.MODEL.HEAD.TYPE,
     )
 
-    if 'TBSITrack' in cfg.MODEL.PRETRAIN_FILE and training:
+    if 'MDIMTrack' in cfg.MODEL.PRETRAIN_FILE and training:
         pretrained_file = os.path.join(pretrained_path, cfg.MODEL.PRETRAIN_FILE)
         checkpoint = torch.load(pretrained_file, map_location="cpu")
         missing_keys, unexpected_keys = model.load_state_dict(checkpoint["net"], strict=False)
         print('Load pretrained model from: ' + cfg.MODEL.PRETRAIN_FILE)
 
     return model
+
