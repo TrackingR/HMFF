@@ -213,11 +213,8 @@ class VisionTransformerMDIM(BaseBackbone):
             if self.MDIM_loc is not None and i in self.MDIM_loc:
                 x_v, x_i = self.MDIM_layers[MDIM_index](x_v, x_i, lens_z)
                 MDIM_index += 1
-        x_v = recover_tokens(x_v, lens_z, lens_x, mode=self.cat_mode)
-        x_i = recover_tokens(x_i, lens_z, lens_x, mode=self.cat_mode)
         x = torch.cat([x_v, x_i], dim=1)
-        aux_dict = {"attn": None}
-        return self.norm(x), aux_dict
+        return self.norm(x)
 
     def init_weights(self, mode=''):
         assert mode in ('jax', 'jax_nlhb', 'nlhb', '')
