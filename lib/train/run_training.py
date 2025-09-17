@@ -78,11 +78,11 @@ def run_training(script_name, config_name, cudnn_benchmark=True, local_rank=-1, 
 
 def main():
     parser = argparse.ArgumentParser(description='Run a train scripts in train_settings.')
-    parser.add_argument('--script', default='tbsi_track', type=str, help='Name of the train script.')
-    parser.add_argument('--config', default='vitb_256_tbsi_32x1_1e4_lasher_15ep_sot', type=str, help="Name of the config file.")
+    parser.add_argument('--script', default='', type=str, help='Name of the train script.')
+    parser.add_argument('--config', default='', type=str, help="Name of the config file.")
     parser.add_argument('--cudnn_benchmark', type=bool, default=True, help='Set cudnn benchmark on (1) or off (0) (default is on).')
     parser.add_argument('--local_rankcpu', default=-1, type=int, help='node rank for distributed training')
-    parser.add_argument('--save_dir', default='./output/vitb_256_tbsi_32x1_1e4_lasher_15ep_sot_msa', type=str, help='the directory to save checkpoints and logs')
+    parser.add_argument('--save_dir', default='./output', type=str, help='the directory to save checkpoints and logs')
     parser.add_argument('--seed', type=int, default=42, help='seed for random numbers')
     parser.add_argument('--use_lmdb', type=int, choices=[0, 1], default=0)  # whether datasets are in lmdb format
     parser.add_argument('--script_prv', type=str, default=None, help='Name of the train script of previous model.')
