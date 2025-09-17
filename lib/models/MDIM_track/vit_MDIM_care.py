@@ -210,9 +210,9 @@ class VisionTransformerMDIM(BaseBackbone):
         for i, blk in enumerate(self.blocks):
             x_v = blk(x_v, x)
             x_i = blk(x_i, x)
-            if self.tbsi_loc is not None and i in self.tbsi_loc:
-                x_v, x_i = self.MDIM_layers[tbsi_index](x_v, x_i, lens_z)
-                tbsi_index += 1
+            if self.MDIM_loc is not None and i in self.MDIM_loc:
+                x_v, x_i = self.MDIM_layers[MDIM_index](x_v, x_i, lens_z)
+                MDIM_index += 1
         x_v = recover_tokens(x_v, lens_z, lens_x, mode=self.cat_mode)
         x_i = recover_tokens(x_i, lens_z, lens_x, mode=self.cat_mode)
         x = torch.cat([x_v, x_i], dim=1)
